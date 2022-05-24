@@ -51,6 +51,9 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
+    'DEFAULT_THROTTLE_RATES': {
+        'number_regeneration': '1/hour',
+    }
 }
 
 ROOT_URLCONF = 'randnums.urls'

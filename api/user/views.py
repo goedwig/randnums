@@ -1,4 +1,4 @@
-from rest_framework import generics
+from rest_framework import generics, throttling
 from rest_framework import permissions
 
 from api.user.serializers import GenerationSerializer
@@ -19,16 +19,24 @@ class GenerationsList(generics.ListCreateAPIView):
 
 
 class GenerationsDetail(generics.RetrieveUpdateAPIView):
+    class NumberRegenerationUserRateThrottle(throttling.UserRateThrottle):
+        scope = 'number_regeneration'
+
+        def allow_request(self, request, view):
+            if request.method != 'PUT':
+                return True
+            return super().allow_request(request, view)
+
     queryset = RandomizedNumber.objects.all()
     serializer_class = GenerationSerializer
     permission_classes = [
         permissions.IsAuthenticated,
         custom_permissions.IsRandomizedNumberOwner,
     ]
+    throttle_classes = [NumberRegenerationUserRateThrottle]
 
     def get_queryset(self):
         return RandomizedNumber.objects.filter(user=self.request.user)
 
     def perform_update(self, serializer):
-        # TODO: Allow updates only once per hour
         serializer.save(value=Randomizer.number())
