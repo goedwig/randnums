@@ -7,7 +7,7 @@ from randomizer import permissions as custom_permissions
 from randomizer.models import RandomizedNumber
 
 
-class GenerationsList(generics.ListCreateAPIView):
+class GenerationsListCreateAPIVIew(generics.ListCreateAPIView):
     queryset = RandomizedNumber.objects.all()
     serializer_class = GenerationSerializer
 
@@ -18,7 +18,7 @@ class GenerationsList(generics.ListCreateAPIView):
         serializer.save(value=Randomizer.number(), user=self.request.user)
 
 
-class GenerationsDetail(generics.RetrieveUpdateAPIView):
+class GenerationsRetrieveUpdateAPIView(generics.RetrieveUpdateAPIView):
     class NumberRegenerationUserRateThrottle(throttling.UserRateThrottle):
         scope = 'number_regeneration'
 
