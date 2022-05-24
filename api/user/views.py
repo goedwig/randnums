@@ -1,5 +1,4 @@
-from rest_framework import generics, throttling
-from rest_framework import permissions
+from rest_framework import generics, permissions, throttling
 
 from api.user.serializers import GenerationSerializer
 from common.util.randomizer import Randomizer
