@@ -1,4 +1,7 @@
-from rest_framework import generics, permissions, throttling
+from django.contrib.auth.models import User
+from django.db.models import Max, Avg
+from rest_framework import generics, permissions, throttling, views
+from rest_framework.response import Response
 
 from api.user.serializers import GenerationSerializer
 from common.util.randomizer import Randomizer
@@ -39,3 +42,28 @@ class GenerationsRetrieveUpdateAPIView(generics.RetrieveUpdateAPIView):
 
     def perform_update(self, serializer):
         serializer.save(value=Randomizer.number())
+
+
+class StatsAPIView(views.APIView):
+    def get(self, request):
+        stats = {}
+
+        qs = RandomizedNumber.objects\
+            .filter(user=request.user)\
+            .aggregate(Max('value'), Avg('value'))
+
+        stats['max'] = qs['value__max']
+        stats['avg'] = qs['value__avg']
+
+        users = User.objects\
+            .annotate(avg_value=Avg('generations__value'))\
+            .order_by('-avg_value')
+
+        position = None
+        for position, user in enumerate(users, start=1):
+            if user == request.user:
+                break
+
+        stats['position'] = position
+
+        return Response(stats)

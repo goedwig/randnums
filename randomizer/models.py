@@ -7,5 +7,6 @@ class RandomizedNumber(TimeStampedModel):
     value = models.IntegerField()
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        related_name='generations',
         on_delete=models.CASCADE,
     )
